@@ -39,7 +39,8 @@ module.exports = {
       'common':resolve('src/common'),
       'components':resolve('src/components'),
       'views':resolve('src/views'),
-      'api':resolve('src/api')
+      'api':resolve('src/api'),
+      'base':resolve('src/base')
     }
   },
   module: {
