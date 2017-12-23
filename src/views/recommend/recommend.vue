@@ -1,8 +1,10 @@
 <template>
   <div class="recommend">
     <div class="recommend-content">
+      <!--通过设置v-if可以在recommends.length存在时渲染组件-->
       <div v-if="recommends.length" class="slider-wrapper">
         <slider>
+          <!--生成轮播内容-->
           <div v-for="item in recommends">
             <a :href="item.linkUrl">
               <img :src="item.picUrl" alt="">
@@ -34,10 +36,10 @@
       this._getRecommend()
     },
     methods: {
+      // 获取轮播内容的链接及图片地址
       _getRecommend() {
         getRecommend().then((res) => {
           if (res.code === ERR_OK) {
-            console.log(res)
             this.recommends = res.data.slider
           }
         })

@@ -5,6 +5,7 @@
       </slot>
     </div>
     <div class="dots">
+      <span class="dot" v-for="(item,index) in dots" :class="{active:currentPageIndex === index}"></span>
     </div>
   </div>
 </template>
@@ -14,6 +15,14 @@
   import {addClass} from 'common/js/dom'
 
   export default {
+    name: 'slider',
+    data() {
+      return {
+        dots: [],
+        currentPageIndex: 0 // 设置当前页
+      }
+    },
+    // 可以从父级接收的参数
     props: {
       loop: {
         type: Boolean,
@@ -30,24 +39,37 @@
     },
     mounted() {
       // 初始化better-scroll
-      setTimeout(() => {
+      this.$nextTick(() => {
         this._setSliderWidth()
+        this._initDots()
         this._initSlider()
-      }, 20)
+
+        if (this.autoPlay) {
+          this._play()
+        }
+      })
+
+      window.addEventListener('resize', () => {
+        if (!this.slider) {
+          return
+        }
+        this._setSliderWidth(true)
+        this.slider.refresh() // 重新计算宽度
+      })
     },
     methods: {
-      _setSliderWidth() {
+      _setSliderWidth(isResize) {
         this.children = this.$refs.sliderGroup.children
 
         let width = 0
         let sliderWidth = this.$refs.slider.clientWidth
         for (let i = 0; i < this.children.length; i++) {
           let child = this.children[i]
-          addClass(child, 'slider-item') // 添加类名
+          addClass(child, 'slider-item')
           child.style.width = sliderWidth + 'px'
           width += sliderWidth
         }
-        if (this.loop) {
+        if (this.loop && !isResize) { // 避免在resize的时候添加宽度
           width += 2 * sliderWidth
         }
         this.$refs.sliderGroup.style.width = width + 'px'
@@ -57,12 +79,31 @@
           scrollX: true,
           scrollY: false,
           momentum: false,
-          snap: true,
-          snapLoop: this.loop,
-          snapThreshold: 0.3,
-          snapSpeed: 400,
-          click: true
+          snap: {
+            loop: this.loop,
+            threshold: 0.3,
+            speed: 400
+          }
+          // click: true // 会阻止默认的click，自己派发click，此处未测出问题
         })
+
+        this.slider.on('scrollEnd', () => {
+          let pageIndex = this.slider.getCurrentPage().pageX // 获取当前是第几个子元素
+          // console.log(pageIndex)
+          // if (this.loop) {
+          //   pageIndex -= 1
+          // }
+          this.currentPageIndex = pageIndex
+        })
+      },
+      _initDots() {
+        this.dots = new Array(this.children.length)
+      },
+      _play() {
+        clearTimeout(this.timer)
+        this.timer = setTimeout(() => {
+          this.slider.next()
+        }, this.interval)
       }
     }
 
