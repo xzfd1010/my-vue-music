@@ -1,22 +1,34 @@
 <template>
   <div class="recommend">
-    <div class="recommend-content">
-      <!--通过设置v-if可以在recommends.length存在时渲染组件-->
-      <div v-if="recommends.length" class="slider-wrapper">
-        <slider>
-          <!--生成轮播内容-->
-          <div v-for="item in recommends">
-            <a :href="item.linkUrl">
-              <img :src="item.picUrl" alt="">
-            </a>
-          </div>
-        </slider>
+    <scroll class="recommend-content" :data="discList" ref="scroll">
+      <div>
+        <!--通过设置v-if可以在recommends.length存在时渲染组件-->
+        <div v-if="recommends.length" class="slider-wrapper">
+          <slider>
+            <!--生成轮播内容-->
+            <div v-for="item in recommends">
+              <a :href="item.linkUrl">
+                <img :src="item.picUrl" alt="">
+              </a>
+            </div>
+          </slider>
+        </div>
+        <div class="recommend-list">
+          <h1 class="list-title">热门歌单推荐</h1>
+          <ul>
+            <li v-for="item in discList" class="item">
+              <div class="icon">
+                <img @load="loadImage" :src="item.imgurl" width="60" height="60" alt="">
+              </div>
+              <div class="text">
+                <h2 class="name" v-html="item.creator.name"></h2>
+                <p class="desc" v-html="item.dissname"></p>
+              </div>
+            </li>
+          </ul>
+        </div>
       </div>
-      <div class="recommend-list">
-        <h1 class="list-title">热门歌单推荐</h1>
-        <ul></ul>
-      </div>
-    </div>
+    </scroll>
   </div>
 </template>
 
@@ -24,12 +36,14 @@
   import Slider from 'base/slider/slider'
   import {getRecommend, getDiscList} from 'api/recommend'
   import {ERR_OK} from 'api/config'
+  import Scroll from 'base/scroll/scroll'
 
   export default {
     name: '',
     data() {
       return {
-        recommends: []
+        recommends: [],
+        discList: []
       }
     },
     created() {
@@ -48,13 +62,20 @@
       _getDiscList() {
         getDiscList().then((res) => {
           if (res.code === ERR_OK) {
-            console.log(res.data.list)
+            this.discList = res.data.list
           }
         })
+      },
+      loadImage() {
+        if (!this.checkLoaded) {
+          this.$refs.scroll.refresh()
+          this.checkLoaded = true
+        }
       }
     },
     components: {
-      Slider
+      Slider,
+      Scroll
     }
   }
 </script>
