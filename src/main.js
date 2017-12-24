@@ -6,8 +6,12 @@ import App from './App'
 import router from './router'
 import 'common/stylus/index.styl'
 import FastClick from 'fastclick'
+import VueLazyLoad from 'vue-lazyload'
 
 FastClick.attach(document.body)
+Vue.use(VueLazyLoad, {
+  loading: require('common/image/default.png') // 默认图片
+})
 
 Vue.config.productionTip = false
 

@@ -18,7 +18,7 @@
           <ul>
             <li v-for="item in discList" class="item">
               <div class="icon">
-                <img @load="loadImage" :src="item.imgurl" width="60" height="60" alt="">
+                <img @load="loadImage" v-lazy="item.imgurl" width="60" height="60" alt="">
               </div>
               <div class="text">
                 <h2 class="name" v-html="item.creator.name"></h2>
@@ -28,11 +28,15 @@
           </ul>
         </div>
       </div>
+      <div class="loading-container" v-show="!discList.length">
+        <loading></loading>
+      </div>
     </scroll>
   </div>
 </template>
 
 <script>
+  import Loading from 'base/loading/loading'
   import Slider from 'base/slider/slider'
   import {getRecommend, getDiscList} from 'api/recommend'
   import {ERR_OK} from 'api/config'
@@ -48,7 +52,9 @@
     },
     created() {
       this._getRecommend()
-      this._getDiscList()
+      setTimeout(() => {
+        this._getDiscList()
+      }, 2000)
     },
     methods: {
       // 获取轮播内容的链接及图片地址
@@ -75,7 +81,8 @@
     },
     components: {
       Slider,
-      Scroll
+      Scroll,
+      Loading
     }
   }
 </script>
