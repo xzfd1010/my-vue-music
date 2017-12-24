@@ -89,10 +89,6 @@
 
         this.slider.on('scrollEnd', () => {
           let pageIndex = this.slider.getCurrentPage().pageX // 获取当前是第几个子元素
-          // console.log(pageIndex)
-          // if (this.loop) {
-          //   pageIndex -= 1
-          // }
           this.currentPageIndex = pageIndex
         })
       },
@@ -105,6 +101,9 @@
           this.slider.next()
         }, this.interval)
       }
+    },
+    destroyed() {
+      clearTimeout(this.timer) // 清空计时器
     }
 
   }
