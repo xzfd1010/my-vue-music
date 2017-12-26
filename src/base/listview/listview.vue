@@ -26,14 +26,22 @@
         </li>
       </ul>
     </div>
+    <div class="list-fixed" v-show="fixedTitle" ref="fixed">
+      <h1 class="fixed-title">{{fixedTitle}}</h1>
+    </div>
+    <div v-show="!data.length" class="loading-container">
+      <loading></loading>
+    </div>
   </scroll>
 </template>
 
 <script type="text/ecmascript-6">
   import Scroll from 'base/scroll/scroll'
   import {getData} from 'common/js/dom'
+  import Loading from 'base/loading/loading'
 
   const ANCHOR_HEIGHT = 18 // 每一个anchor的高度
+  const TITLE_HEIGHT = 30
 
   export default {
     created() {
@@ -45,7 +53,8 @@
     data() {
       return {
         scrollY: -1, // 实时滚动的位置
-        currentIndex: 0
+        currentIndex: 0,
+        diff: -1 // 表示滚动的区块的上限和scrollY的差，判断差值是否小于fixedTitle的高度
       }
     },
     props: {
@@ -60,10 +69,18 @@
         return this.data.map((group) => {
           return group.title.substr(0, 1)
         })
+      },
+      fixedTitle() {
+        if (this.scrollY > 0) {
+          return ''
+        }
+
+        return this.data[this.currentIndex] ? this.data[this.currentIndex].title : ''
       }
     },
     components: {
-      Scroll
+      Scroll,
+      Loading
     },
     methods: {
       onShortcutTouchStart(e) {
@@ -83,7 +100,6 @@
       // pos {x,y}
       scroll(pos) {
         this.scrollY = pos.y
-        console.log(this.scrollY, this.currentIndex)
       },
       _scrollTo(index) {
         if (!index && index !== 0) {
@@ -120,7 +136,6 @@
       // 这里的newY是当前的滚动值，新的位置
       scrollY(newY) {
         const listHeight = this.listHeight
-        console.log(listHeight)
         // 当滚动到顶部，newY>0
         if (newY > 0) {
           this.currentIndex = 0
@@ -132,11 +147,20 @@
           let height2 = listHeight[i + 1]
           if (-newY >= height1 && -newY < height2) {
             this.currentIndex = i
+            this.diff = height2 + newY
             return
           }
         }
         // 滚动到底部，且-newY>最后一个元素的上限
         this.currentIndex = listHeight.length - 2
+      },
+      diff(newVal) {
+        let fixedTop = (newVal > 0 && newVal < TITLE_HEIGHT) ? newVal - TITLE_HEIGHT : 0 // 实际是一个负值
+        if (this.fixedTop === fixedTop) {
+          return
+        }
+        this.fixedTop = fixedTop
+        this.$refs.fixed.style.transform = `translate3d(0,${fixedTop}px,0)`
       }
     }
   }
