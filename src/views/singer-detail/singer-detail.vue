@@ -8,8 +8,14 @@
   import {mapGetters} from 'vuex' // 获取数据的语法糖
   import {getSingerDetail} from 'api/singer'
   import {ERR_OK} from 'api/config'
+  import {createSong} from 'common/js/song'
 
   export default {
+    data() {
+      return {
+        songs: []
+      }
+    },
     computed: {
       ...mapGetters([
         'singer' // 对应getters中的singer
@@ -28,8 +34,20 @@
         getSingerDetail(this.singer.id).then(res => {
           if (res.code === ERR_OK) {
             console.log(res.data.list)
+            this.songs = this._normalizeSongs(res.data.list)
+            console.log(this.songs)
           }
         })
+      },
+      _normalizeSongs(list) {
+        let ret = []
+        list.forEach((item) => {
+          let {musicData} = item
+          if (musicData.songid && musicData.albummid) {
+            ret.push(createSong(musicData)) // 创建songs
+          }
+        })
+        return ret
       }
     }
   }
