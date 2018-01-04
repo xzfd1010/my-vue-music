@@ -22,7 +22,8 @@ export function createSong(musicData) {
     album: musicData.albumname,
     duration: musicData.interval,
     image: `https://y.gtimg.cn/music/photo_new/T002R300x300M000${musicData.albummid}.jpg?max_age=2592000`,
-    url: `http://ws.stream.qqmusic.qq.com/${musicData.songid}.m4a?fromtag=46` // 播放地址
+    // url: `http://ws.stream.qqmusic.qq.com/${musicData.songid}.m4a?fromtag=46` // 播放地址
+    url: 'http://dl.stream.qqmusic.qq.com/C4000039MnYb0qxYhV.m4a?vkey=FF31AA0BEA231A818F4B8B78AC1F7A8D24E4F0CF6C166D874AE506F014B2FFD0974EB7E726C7564827D26324BDDFC1F956171336A10DE2BF&guid=2909629524&uin=417466521&fromtag=66'
   })
 }
 
