@@ -27,6 +27,11 @@
           </div>
         </div>
         <div class="bottom">
+          <div class="progress-wrapper">
+            <span class="time time-l">{{format(currentTime)}}</span>
+            <div class="progress-bar-wrapper"></div>
+            <span class="time time-r">{{format(currentSong.duration)}}</span>
+          </div>
           <div class="operators">
             <div class="icon i-left">
               <i class="icon-sequence"></i>
@@ -64,7 +69,7 @@
       </div>
     </transition>
     <!--在currentSong发生改变的时候执行play()-->
-    <audio :src="currentSong.url" ref="audio" @canplay="ready" @error="error"></audio>
+    <audio :src="currentSong.url" ref="audio" @canplay="ready" @error="error" @timeupdate="updateTime"></audio>
   </div>
 </template>
 
@@ -78,7 +83,8 @@
   export default {
     data() {
       return {
-        songReady: false
+        songReady: false,
+        currentTime: 0
       }
     },
     computed: {
@@ -192,6 +198,23 @@
       error() {
         // 报错时，如果不修改状态，播放等功能就无法触发
         this.songReady = true
+      },
+      updateTime(e) {
+        this.currentTime = e.target.currentTime // audio当前的播放时间，可读写
+      },
+      format(interval) {
+        interval = interval | 0 // 向下取整
+        const minute = this._pad(interval / 60 | 0)
+        const second = this._pad(interval % 60)
+        return `${minute}:${second}`
+      },
+      _pad(num, n = 2) {
+        let len = num.toString().length
+        while (len < n) {
+          num = '0' + num
+          len++
+        }
+        return num
       },
       _getPosAndScale() {
         // 计算距离的方法
