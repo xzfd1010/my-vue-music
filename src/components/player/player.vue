@@ -306,6 +306,7 @@
         }
         this.$nextTick(() => {
           this.$refs.audio.play()
+          this.currentSong.getLyric()
         })
       },
       // watch playing 来控制播放器
