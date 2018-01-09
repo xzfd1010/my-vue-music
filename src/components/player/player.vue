@@ -72,7 +72,8 @@
       </div>
     </transition>
     <!--在currentSong发生改变的时候执行play()-->
-    <audio :src="currentSong.url" ref="audio" @canplay="ready" @error="error" @timeupdate="updateTime"></audio>
+    <audio :src="currentSong.url" ref="audio" @canplay="ready" @error="error" @timeupdate="updateTime"
+           @ended="end"></audio>
   </div>
 </template>
 
@@ -252,6 +253,18 @@
         })
         // 重设index
         this.setCurrentIndex(index)
+      },
+      end() {
+        // 应该根据播放模式切换到下一首
+        if (this.mode === playMode.loop) {
+          this.loop()
+        } else {
+          this.next()
+        }
+      },
+      loop() {
+        this.$refs.audio.currentTime = 0 // 从头播放
+        this.$refs.audio.play()
       },
       _pad(num, n = 2) {
         let len = num.toString().length

@@ -49,7 +49,11 @@
         this._triggerPercent()
       },
       progressClick(e) {
-        this._offset(e.offsetX) // 相对父容器的偏移量
+        const rect = this.$refs.progressBar.getBoundingClientRect()
+        const offsetWidth = e.pageX - rect.left
+        this._offset(offsetWidth)
+        // 点击到progressBtn时 e.offsetX 获取不对
+        // this._offset(e.offsetX) // 相对父容器的偏移量
         this._triggerPercent()
       },
       _offset(offsetWidth) {
