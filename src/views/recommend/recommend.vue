@@ -1,5 +1,5 @@
 <template>
-  <div class="recommend">
+  <div class="recommend" ref="recommend">
     <scroll class="recommend-content" :data="discList" ref="scroll">
       <div>
         <!--通过设置v-if可以在recommends.length存在时渲染组件-->
@@ -41,8 +41,10 @@
   import {getRecommend, getDiscList} from 'api/recommend'
   import {ERR_OK} from 'api/config'
   import Scroll from 'base/scroll/scroll'
+  import {playlistMixin} from '../../common/js/mixin'
 
   export default {
+    mixins: [playlistMixin],
     name: '',
     data() {
       return {
@@ -57,6 +59,11 @@
       }, 2000)
     },
     methods: {
+      handlePlaylist(playlist) {
+        const bottom = playlist.length > 0 ? '60px' : ''
+        this.$refs.recommend.style.bottom = bottom
+        this.$refs.scroll.refresh()
+      },
       // 获取轮播内容的链接及图片地址
       _getRecommend() {
         getRecommend().then((res) => {

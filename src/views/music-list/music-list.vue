@@ -14,7 +14,11 @@
       <div class="filter" ref="filter"></div>
     </div>
     <div class="bg-layer" ref="layer"></div>
-    <scroll @scroll="scroll" :probe-type="probeType" :listen-scroll="listenScroll" :data="songs" class="list"
+    <scroll @scroll="scroll"
+            :probe-type="probeType"
+            :listen-scroll="listenScroll"
+            :data="songs"
+            class="list"
             ref="list">
       <div class="song-list-wrapper">
         <song-list @select="selectItem" :songs="songs"></song-list>
@@ -32,12 +36,15 @@
   import Loading from 'base/loading/loading'
   import {prefixStyle} from 'common/js/dom'
   import {mapActions} from 'vuex'
+  import {playlistMixin} from 'common/js/mixin'
 
   const RESERVED_HEIGHT = 40
   const transform = prefixStyle('transform')
   const backdrop = prefixStyle('backdrop-filter')
 
   export default {
+    // 代码merge到组件中，同名方法会覆盖mixin中的方法
+    mixins: [playlistMixin],
     props: {
       bgImage: {
         type: String,
@@ -73,6 +80,12 @@
       this.$refs.list.$el.style.top = `${this.$refs.bgImage.clientHeight}px`
     },
     methods: {
+      handlePlaylist(playlist) {
+        // 处理高度问题
+        const bottom = playlist.length > 0 ? '60px' : ''
+        this.$refs.list.$el.style.bottom = bottom
+        this.$refs.list.refresh()
+      },
       scroll(pos) {
         this.scrollY = pos.y
       },

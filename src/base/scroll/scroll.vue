@@ -52,7 +52,7 @@
       },
       // 重新计算高度
       refresh() {
-        this.refresh && this.scroll.refresh()
+        this.scroll && this.scroll.refresh()
       },
       scrollTo() {
         this.scroll && this.scroll.scrollTo.apply(this.scroll, arguments)
