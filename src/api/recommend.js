@@ -36,3 +36,28 @@ export function getDiscList() {
     console.log(rej)
   })
 }
+
+export function getSongList(disstid) {
+  const url = '/api/getSongList'
+
+  const data = Object.assign({}, commonParams, {
+    disstid,
+    type: 1,
+    json: 1,
+    utf8: 1,
+    onlysong: 0,
+    hostUin: 0,
+    platform: 'yqq',
+    needNewCode: 0,
+    loginUin: 0
+  })
+
+  return axios.get(url, {
+    params: data
+  }).then((res) => {
+    console.log(res.data)
+    return Promise.resolve(res.data)
+  }).catch(rej => {
+    console.log(rej)
+  })
+}

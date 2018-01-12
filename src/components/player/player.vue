@@ -479,7 +479,7 @@
         z-index: -1
         opacity: 0.6
         filter: blur(20px)
-      .top
+      .top // 40px + 20px + 20px = 80px
         position: relative
         margin-bottom: 20px
         .back
@@ -506,7 +506,7 @@
           text-align: center
           font-size: $font-size-medium
           color: $color-text
-      .middle
+      .middle // 上面80px，下面170px，即middle部分是弹性的
         position: fixed
         width: 100%
         top: 80px
@@ -570,7 +570,7 @@
               font-size: $font-size-medium
               &.current
                 color: $color-text
-      .bottom
+      .bottom // 距离底部50px，自身98px，那么距离middle就是20px
         position: absolute
         bottom: 50px
         width: 100%
