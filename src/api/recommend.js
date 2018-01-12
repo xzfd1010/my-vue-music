@@ -55,7 +55,6 @@ export function getSongList(disstid) {
   return axios.get(url, {
     params: data
   }).then((res) => {
-    console.log(res.data)
     return Promise.resolve(res.data)
   }).catch(rej => {
     console.log(rej)
