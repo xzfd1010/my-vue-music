@@ -25,6 +25,11 @@
       listenScroll: {
         type: Boolean,
         default: false
+      },
+      // 是否上拉刷新
+      pullup: {
+        type: Boolean,
+        default: true
       }
     },
     methods: {
@@ -41,6 +46,15 @@
           let me = this
           this.scroll.on('scroll', (pos) => {
             me.$emit('scroll', pos) // 派发scroll事件，可以在外部指定事件
+          })
+        }
+
+        if (this.pullup) {
+          // scrollEnd表示scroll停止
+          this.scroll.on('scrollEnd', () => {
+            if (this.scroll.y <= (this.scroll.maxScrollY + 50)) {
+              this.$emit('scrollToEnd') // 表示滚动到底部了 派发scrollToEnd事件
+            }
           })
         }
       },

@@ -1,5 +1,9 @@
 <template>
-  <div class="suggest">
+  <scroll class="suggest"
+          :data="result"
+          :pullup="pullup"
+          @scrollToEnd="searchMore"
+          ref="suggest">
     <ul class="suggest-list">
       <li class="suggest-item" v-for="item in result">
         <div class="icon">
@@ -9,16 +13,20 @@
           <p class="text" v-html="getDisplayName(item)"></p>
         </div>
       </li>
+      <loading v-show="hasMore" title=""></loading>
     </ul>
-  </div>
+  </scroll>
 </template>
 
 <script>
   import {search} from 'api/search'
   import {ERR_OK} from '../../api/config'
-  import {filterSinger} from 'common/js/song'
+  import {createSong} from 'common/js/song'
+  import Scroll from 'base/scroll/scroll'
+  import Loading from 'base/loading/loading'
 
   const TYPE_SINGER = 'singer'
+  const perpage = 20 // 通过perpage控制请求数量
 
   export default {
     name: '',
@@ -36,15 +44,35 @@
     data() {
       return {
         page: 1,
-        result: []
+        result: [],
+        pullup: true,
+        hasMore: true // 表示是否加载完的标志位
       }
     },
     methods: {
+      // 代表第一次发送请求、query变化重置请求
       search() {
+        this.page = 1 // 重置页数
         // 请求服务端的方法
-        search(this.query, this.page, this.showSinger).then(res => {
+        this.hasMore = true
+        this.$refs.suggest.scrollTo(0, 0)
+        search(this.query, this.page, this.showSinger, perpage).then(res => {
           if (res.code === ERR_OK) {
+            // 获取到data之后，进行处理；如果有song属性，映射为song对象
             this.result = this._genResult(res.data)
+            this._checkMore(res.data)
+          }
+        })
+      },
+      searchMore() {
+        if (!this.hasMore) {
+          return
+        }
+        this.page++
+        search(this.query, this.page, this.showSinger, perpage).then(res => {
+          if (res.code === ERR_OK) {
+            this.result = this.result.concat(this._genResult(res.data))
+            this._checkMore(res.data)
           }
         })
       },
@@ -60,7 +88,14 @@
         if (item.type === TYPE_SINGER) {
           return item.singername
         } else {
-          return `${item.songname}-${filterSinger(item.singer)}`
+          // item已经是song对象，可以直接取name和singer，不需要暴露singername
+          return `${item.name}-${item.singer}`
+        }
+      },
+      _checkMore(data) {
+        const song = data.song
+        if (!song.list.length || (song.curnum + song.curpage * perpage) >= song.totalnum) {
+          this.hasMore = false
         }
       },
       _genResult(data) {
@@ -71,8 +106,17 @@
         }
         // 获取歌曲的数据
         if (data.song) {
-          ret = ret.concat(data.song.list)
+          ret = ret.concat(this._normalizeSongs(data.song.list))
         }
+        return ret
+      },
+      _normalizeSongs(list) {
+        let ret = []
+        list.forEach((musicData) => {
+          if (musicData.songid && musicData.albumid) {
+            ret.push(createSong(musicData))
+          }
+        })
         return ret
       }
     },
@@ -80,6 +124,10 @@
       query() {
         this.search()
       }
+    },
+    components: {
+      Scroll,
+      Loading
     }
   }
 </script>
