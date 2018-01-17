@@ -7,6 +7,8 @@
 </template>
 
 <script>
+  import {debounce} from 'common/js/util'
+
   export default {
     props: {
       placeholder: {
@@ -28,11 +30,11 @@
       }
     },
     created() {
-      // 为什么用这种方式？
+      // 为什么用这种方式？需要节流
       // 这里是将子组件内容传递给父组件
-      this.$watch('query', (newQuery) => {
+      this.$watch('query', debounce((newQuery) => {
         this.$emit('query', newQuery)
-      })
+      }, 200)) // 200ms内只会触发一次
     }
   }
 </script>

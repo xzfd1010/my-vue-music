@@ -14,3 +14,17 @@ export function shuffle(arr) {
   }
   return _arr
 }
+
+// 节流，函数柯里化——调用一个函数，返回一个函数
+export function debounce(func, delay) {
+  let timer
+
+  return function (...args) { // 如果此函数反复调用，不会多次触发，只会触发一次
+    if (timer) {
+      clearTimeout(timer)
+    }
+    timer = setTimeout(() => {
+      func.apply(this, args)
+    }, delay)
+  }
+}
