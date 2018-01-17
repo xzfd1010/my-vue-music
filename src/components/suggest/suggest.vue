@@ -15,6 +15,9 @@
       </li>
       <loading v-show="hasMore" title=""></loading>
     </ul>
+    <div class="no-result-wrapper" v-show="!hasMore && !result.length">
+      <no-result title="抱歉，暂无搜索结果"></no-result>
+    </div>
   </scroll>
 </template>
 
@@ -26,6 +29,7 @@
   import Loading from 'base/loading/loading'
   import Singer from 'common/js/singer'
   import {mapMutations, mapActions} from 'vuex'
+  import NoResult from 'base/no-result/no-result'
 
   const TYPE_SINGER = 'singer'
   const perpage = 20 // 通过perpage控制请求数量
@@ -152,7 +156,8 @@
     },
     components: {
       Scroll,
-      Loading
+      Loading,
+      NoResult
     }
   }
 </script>
@@ -162,7 +167,7 @@
   @import "~common/stylus/mixin"
 
   .suggest
-    height: 100%
+    height: 100% // 通过height设置了scroll的高度
     overflow: hidden
     .suggest-list
       padding: 0 30px
