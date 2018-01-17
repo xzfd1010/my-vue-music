@@ -37,9 +37,9 @@ export const randomPlay = function ({commit}, {list}) {
 }
 
 export const insertSong = function ({commit, state}, song) {
-  let playlist = state.playlist
-  let sequenceList = state.sequenceList
-  let currentIndex = state.currentIndex
+  let playlist = state.playlist.slice() // 获取playlist的副本，避免在mutation之外修改playlist
+  let sequenceList = state.sequenceList.slice()
+  let currentIndex = state.currentIndex // 值传递
   // 记录当前歌曲
   let currentSong = playlist[currentIndex]
   // 查找当前列表中是否有待插入的歌曲，并返回其索引
@@ -73,7 +73,7 @@ export const insertSong = function ({commit, state}, song) {
     }
   }
 
-  commit(types.SET_PLAYLIST, playlist)
+  commit(types.SET_PLAYLIST, playlist) // 这里提交
   commit(types.SET_SEQUENCE_LIST, sequenceList)
   commit(types.SET_CURRENT_INDEX, currentIndex)
   commit(types.SET_FULL_SCREEN, true)
