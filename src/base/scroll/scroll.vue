@@ -30,6 +30,10 @@
       pullup: {
         type: Boolean,
         default: true
+      },
+      beforeScroll: {
+        type: Boolean,
+        default: false
       }
     },
     methods: {
@@ -55,6 +59,11 @@
             if (this.scroll.y <= (this.scroll.maxScrollY + 50)) {
               this.$emit('scrollToEnd') // 表示滚动到底部了 派发scrollToEnd事件
             }
+          })
+        }
+        if (this.beforeScroll) {
+          this.scroll.on('beforeScrollStart', () => {
+            this.$emit('beforeScroll')
           })
         }
       },

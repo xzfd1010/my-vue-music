@@ -2,7 +2,9 @@
   <scroll class="suggest"
           :data="result"
           :pullup="pullup"
+          :beforeScroll="beforeScroll"
           @scrollToEnd="searchMore"
+          @beforeScroll="listScroll"
           ref="suggest">
     <ul class="suggest-list">
       <li @click="selectItem(item)" class="suggest-item" v-for="item in result">
@@ -52,6 +54,7 @@
         page: 1,
         result: [],
         pullup: true,
+        beforeScroll: true,
         hasMore: true // 表示是否加载完的标志位
       }
     },
@@ -114,6 +117,11 @@
           // 需要修改的状态：playlist,sequenceList,currentIndex 如果playlist有这首歌，需要删掉原有的song，比较复杂，封装为action
           this.insertSong(item)
         }
+        // 派发事件，交给父组件处理，用于保存历史
+        this.$emit('select')
+      },
+      listScroll() {
+        this.$emit('listScroll')
       },
       _checkMore(data) {
         const song = data.song
