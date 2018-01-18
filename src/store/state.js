@@ -16,7 +16,7 @@ const state = {
   currentIndex: -1, // 当前播放歌曲的索引
   disc: {},
   topList: {},
-  searchHistory: loadSearch // 获取之前的值
+  searchHistory: loadSearch() // 获取之前的值
 }
 
 export default state
