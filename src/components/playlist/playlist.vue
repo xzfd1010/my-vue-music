@@ -1,7 +1,7 @@
 <template>
   <transition name="list-fade">
-    <div class="playlist">
-      <div class="list-wrapper">
+    <div class="playlist" v-show="showFlag" @click="hide">
+      <div class="list-wrapper" @click.stop>
         <div class="list-header">
           <h1 class="title">
             <i class="icon"></i>
@@ -11,12 +11,12 @@
             </span>
           </h1>
         </div>
-        <div class="list-content">
+        <scroll :data="playlist" class="list-content" ref="listContent">
           <ul>
-            <li class="item">
-              <i class="current"></i>
-              <span class="text"></span>
-              <span class="list">
+            <li ref="listItem" class="item" v-for="(item,index) in playlist" @click="selectItem(item,index)">
+              <i class="current" :class="getCurrentIcon(item)"></i>
+              <span class="text">{{item.name}}</span>
+              <span class="like">
                 <i class="icon-not-favorite"></i>
               </span>
               <span class="delete">
@@ -24,7 +24,7 @@
               </span>
             </li>
           </ul>
-        </div>
+        </scroll>
         <div class="list-operate">
           <div class="add">
             <i class="icon-add"></i>
@@ -32,7 +32,7 @@
           </div>
         </div>
         <div class="list-close">
-          <span>关闭</span>
+          <span @click="hide">关闭</span>
         </div>
       </div>
     </div>
@@ -40,7 +40,73 @@
 </template>
 
 <script type="text/ecmascript-6">
-  export default {}
+  import Scroll from 'base/scroll/scroll'
+  import {playMode} from 'common/js/config'
+  import {mapGetters, mapMutations} from 'vuex'
+
+  export default {
+    data() {
+      return {
+        showFlag: false
+      }
+    },
+    computed: {
+      ...mapGetters([
+        'currentSong',
+        'playlist'
+      ])
+    },
+    methods: {
+      show() {
+        this.showFlag = true
+        setTimeout(() => {
+          this.$refs.listContent.refresh()
+          this.scrollToCurrent(this.currentSong)
+        }, 20)
+      },
+      hide() {
+        this.showFlag = false
+      },
+      getCurrentIcon(item) {
+        if (this.currentSong.id === item.id) {
+          return 'icon-play'
+        }
+        return ''
+      },
+      selectItem(item, index) {
+        console.log(index)
+        if (this.mode === playMode.random) {
+          // 这里的index还不对
+          index = this.playlist.findIndex((song) => {
+            return song.id === item.id
+          })
+        }
+        this.setCurrentIndex(index)
+        this.setPlayingState(true)
+      },
+      scrollToCurrent(current) {
+        const index = this.playlist.findIndex((song) => {
+          return current.id === song.id
+        })
+        this.$refs.listContent.scrollToElement(this.$refs.listItem[index], 300)
+      },
+      ...mapMutations({
+        'setCurrentIndex': 'SET_CURRENT_INDEX',
+        'setPlayingState': 'SET_PLAYING_STATE'
+      })
+    },
+    watch: {
+      currentSong(newSong, oldSong) {
+        if (!this.showFlag || newSong.id === oldSong.id) {
+          return
+        }
+        this.scrollToCurrent(newSong)
+      }
+    },
+    components: {
+      Scroll
+    }
+  }
 </script>
 
 <style scoped lang="stylus" type="text/stylus">
