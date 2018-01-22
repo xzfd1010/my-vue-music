@@ -93,3 +93,29 @@ export const deleteSearchHistory = function ({commit}, query) {
 export const clearSearchHistory = function ({commit}) {
   commit(types.SET_SEARCH_HISTORY, clearSearch())
 }
+
+export const deleteSong = function ({commit, state}, song) {
+  let playlist = state.playlist.slice() // 获取playlist的副本，避免在mutation之外修改playlist
+  let sequenceList = state.sequenceList.slice()
+  let currentIndex = state.currentIndex // 值传递
+  let pIndex = findIndex(playlist, song)
+
+  playlist.splice(pIndex, 1)
+  let sIndex = findIndex(sequenceList, song)
+  sequenceList.splice(sIndex, 1)
+
+  if (currentIndex > pIndex || currentIndex === playlist.length) {
+    currentIndex-- // 当前播放歌曲在删除索引之后，要把currentIndex--；删除的是最后一首歌，currentIndex--
+  }
+
+  commit(types.SET_PLAYLIST, playlist)
+  commit(types.SET_SEQUENCE_LIST, sequenceList)
+  commit(types.SET_CURRENT_INDEX, currentIndex)
+
+  if (!playlist.length) {
+    commit(types.SET_PLAYING_STATE, false)
+  } else {
+    // 如果还有歌曲，就继续播放
+    commit(types.SET_PLAYING_STATE, true)
+  }
+}

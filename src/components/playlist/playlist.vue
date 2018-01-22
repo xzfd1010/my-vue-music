@@ -11,15 +11,15 @@
             </span>
           </h1>
         </div>
-        <scroll :data="playlist" class="list-content" ref="listContent">
+        <scroll :data="sequenceList" class="list-content" ref="listContent">
           <ul>
-            <li ref="listItem" class="item" v-for="(item,index) in playlist" @click="selectItem(item,index)">
+            <li ref="listItem" class="item" v-for="(item,index) in sequenceList" @click="selectItem(item,index)">
               <i class="current" :class="getCurrentIcon(item)"></i>
               <span class="text">{{item.name}}</span>
               <span class="like">
                 <i class="icon-not-favorite"></i>
               </span>
-              <span class="delete">
+              <span class="delete" @click.stop="deleteOne(item)">
                 <i class="icon-delete"></i>
               </span>
             </li>
@@ -42,7 +42,7 @@
 <script type="text/ecmascript-6">
   import Scroll from 'base/scroll/scroll'
   import {playMode} from 'common/js/config'
-  import {mapGetters, mapMutations} from 'vuex'
+  import {mapGetters, mapMutations, mapActions} from 'vuex'
 
   export default {
     data() {
@@ -52,8 +52,10 @@
     },
     computed: {
       ...mapGetters([
+        'sequenceList',
         'currentSong',
-        'playlist'
+        'playlist',
+        'mode'
       ])
     },
     methods: {
@@ -74,9 +76,7 @@
         return ''
       },
       selectItem(item, index) {
-        console.log(index)
         if (this.mode === playMode.random) {
-          // 这里的index还不对
           index = this.playlist.findIndex((song) => {
             return song.id === item.id
           })
@@ -84,16 +84,26 @@
         this.setCurrentIndex(index)
         this.setPlayingState(true)
       },
+      // 滚动到当前歌曲
       scrollToCurrent(current) {
-        const index = this.playlist.findIndex((song) => {
+        const index = this.sequenceList.findIndex((song) => {
           return current.id === song.id
         })
         this.$refs.listContent.scrollToElement(this.$refs.listItem[index], 300)
       },
+      deleteOne(item) {
+        this.deleteSong(item)
+        if (!this.playlist.length) {
+          this.playlist.hide()
+        }
+      },
       ...mapMutations({
         'setCurrentIndex': 'SET_CURRENT_INDEX',
         'setPlayingState': 'SET_PLAYING_STATE'
-      })
+      }),
+      ...mapActions([
+        'deleteSong'
+      ])
     },
     watch: {
       currentSong(newSong, oldSong) {

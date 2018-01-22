@@ -432,6 +432,10 @@
     },
     watch: {
       currentSong(newSong, oldSong) {
+        // 避免列表为空时还去查询
+        if (!newSong.id) {
+          return
+        }
         // 避免切换播放模式时出现bug
         if (newSong.id === oldSong.id) {
           return
