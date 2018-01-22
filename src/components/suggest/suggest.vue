@@ -59,6 +59,10 @@
       }
     },
     methods: {
+      // 让内部的scroll滚动
+      refresh() {
+        this.$refs.suggest.refresh()
+      },
       // 代表第一次发送请求、query变化重置请求
       search() {
         this.page = 1 // 重置页数
