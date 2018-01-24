@@ -6,14 +6,15 @@
           <h1 class="title">
             <i class="icon"></i>
             <span class="text"></span>
-            <span class="clear">
+            <span class="clear" @click="showConfirm">
               <i class="icon-clear"></i>
             </span>
           </h1>
         </div>
         <scroll :data="sequenceList" class="list-content" ref="listContent">
-          <ul>
-            <li ref="listItem" class="item" v-for="(item,index) in sequenceList" @click="selectItem(item,index)">
+          <transition-group name="list" tag="ul">
+            <li :key="item.id" ref="listItem" class="item" v-for="(item,index) in sequenceList"
+                @click="selectItem(item,index)">
               <i class="current" :class="getCurrentIcon(item)"></i>
               <span class="text">{{item.name}}</span>
               <span class="like">
@@ -23,7 +24,7 @@
                 <i class="icon-delete"></i>
               </span>
             </li>
-          </ul>
+          </transition-group>
         </scroll>
         <div class="list-operate">
           <div class="add">
@@ -35,6 +36,10 @@
           <span @click="hide">关闭</span>
         </div>
       </div>
+      <confirm ref="confirm"
+               text="是否清空播放列表"
+               confirmBtnText="清空"
+               @confirm="confirmClear"></confirm>
     </div>
   </transition>
 </template>
@@ -43,6 +48,7 @@
   import Scroll from 'base/scroll/scroll'
   import {playMode} from 'common/js/config'
   import {mapGetters, mapMutations, mapActions} from 'vuex'
+  import Confirm from 'base/confirm/confirm'
 
   export default {
     data() {
@@ -94,15 +100,23 @@
       deleteOne(item) {
         this.deleteSong(item)
         if (!this.playlist.length) {
-          this.playlist.hide()
+          this.hide()
         }
+      },
+      showConfirm() {
+        this.$refs.confirm.show()
+      },
+      confirmClear() {
+        this.deleteSongList()
+        this.hide()
       },
       ...mapMutations({
         'setCurrentIndex': 'SET_CURRENT_INDEX',
         'setPlayingState': 'SET_PLAYING_STATE'
       }),
       ...mapActions([
-        'deleteSong'
+        'deleteSong',
+        'deleteSongList'
       ])
     },
     watch: {
@@ -114,7 +128,8 @@
       }
     },
     components: {
-      Scroll
+      Scroll,
+      Confirm
     }
   }
 </script>
