@@ -1,5 +1,7 @@
 // 利用mixin来解决miniPlayer出现之后高度错误的问题
-import {mapGetters} from 'vuex'
+import {playMode} from 'common/js/config'
+import {shuffle} from 'common/js/util'
+import {mapGetters, mapMutations} from 'vuex'
 
 export const playlistMixin = {
   computed: {
@@ -22,5 +24,49 @@ export const playlistMixin = {
     handlePlaylist() {
       throw new Error('component must implement handlePlaylist method')
     }
+  }
+}
+
+export const playerMixin = {
+  computed: {
+    iconMode() {
+      return this.mode === playMode.sequence ? 'icon-sequence' : this.mode === playMode.loop ? 'icon-loop' : 'icon-random'
+    },
+    ...mapGetters([
+      'sequenceList',
+      'currentSong',
+      'playlist',
+      'mode'
+    ])
+  },
+  methods: {
+    changeMode() {
+      const mode = (this.mode + 1) % 3
+      this.setPlayMode(mode)
+      // 切换播放模式实际上是修改播放列表
+      let list = null
+      if (mode === playMode.random) {
+        list = shuffle(this.sequenceList)
+      } else {
+        list = this.sequenceList
+      }
+      // 保证currentSong不改变
+      this.resetCurrentIndex(list)
+      this.setPlaylist(list)
+    },
+    resetCurrentIndex(list) {
+      // 获取当前列表中当前播放歌曲的index
+      let index = list.findIndex((item) => {
+        return item.id === this.currentSong.id
+      })
+      // 重设index
+      this.setCurrentIndex(index)
+    },
+    ...mapMutations({
+      setPlayingState: 'SET_PLAYING_STATE',
+      setCurrentIndex: 'SET_CURRENT_INDEX',
+      setPlayMode: 'SET_PLAY_MODE',
+      setPlaylist: 'SET_PLAYLIST'
+    })
   }
 }
