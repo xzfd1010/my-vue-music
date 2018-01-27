@@ -1,7 +1,7 @@
 // 利用mixin来解决miniPlayer出现之后高度错误的问题
 import {playMode} from 'common/js/config'
 import {shuffle} from 'common/js/util'
-import {mapGetters, mapMutations} from 'vuex'
+import {mapGetters, mapMutations, mapActions} from 'vuex'
 
 export const playlistMixin = {
   computed: {
@@ -68,5 +68,39 @@ export const playerMixin = {
       setPlayMode: 'SET_PLAY_MODE',
       setPlaylist: 'SET_PLAYLIST'
     })
+  }
+}
+
+export const searchMixin = {
+  data() {
+    return {
+      query: ''
+    }
+  },
+  computed: {
+    ...mapGetters([
+      'searchHistory'
+    ])
+  },
+  methods: {
+    blurInput() {
+      this.$refs.searchBox.blur()
+    },
+    saveSearch() {
+      // 需要封装action
+      this.saveSearchHistory(this.query)
+    },
+    onQueryChange(query) {
+      // 父组件拿到search-box派发的query事件，然后赋值给data的query；
+      // 再传递个suggest，实现了组件之间的数据传递
+      this.query = query
+    },
+    addQuery(query) {
+      this.$refs.searchBox.setQuery(query)
+    },
+    ...mapActions([
+      'saveSearchHistory',
+      'deleteSearchHistory'
+    ])
   }
 }

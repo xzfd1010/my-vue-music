@@ -38,17 +38,16 @@
   import {ERR_OK} from '../../api/config'
   import Suggest from 'components/suggest/suggest'
   import SearchList from 'base/search-list/search-list'
-  import {mapGetters, mapActions} from 'vuex'
+  import {mapActions} from 'vuex'
   import Confirm from 'base/confirm/confirm'
   import Scroll from 'base/scroll/scroll'
-  import {playlistMixin} from 'common/js/mixin'
+  import {playlistMixin, searchMixin} from 'common/js/mixin'
 
   export default {
-    mixins: [playlistMixin],
+    mixins: [playlistMixin, searchMixin],
     data() {
       return {
-        hotKey: [],
-        query: ''
+        hotKey: []
       }
     },
     created() {
@@ -58,10 +57,7 @@
       // 合并数组用于计算scroll的高度
       shortcut() {
         return this.hotKey.concat(this.searchHistory)
-      },
-      ...mapGetters([
-        'searchHistory'
-      ])
+      }
     },
     methods: {
       handlePlaylist(playlist) {
@@ -70,21 +66,6 @@
         this.$refs.shortcut.refresh()
         this.$refs.searchResult.style.bottom = bottom
         this.$refs.suggest.refresh()
-      },
-      addQuery(query) {
-        this.$refs.searchBox.setQuery(query)
-      },
-      onQueryChange(query) {
-        // 父组件拿到search-box派发的query事件，然后赋值给data的query；
-        // 再传递个suggest，实现了组件之间的数据传递
-        this.query = query
-      },
-      blurInput() {
-        this.$refs.searchBox.blur()
-      },
-      saveSearch() {
-        // 需要封装action
-        this.saveSearchHistory(this.query)
       },
       showConfirm() {
         this.$refs.confirm.show()
@@ -98,8 +79,6 @@
       },
       // 实际上就是添加了方法，可以直接写在dom上
       ...mapActions([
-        'saveSearchHistory',
-        'deleteSearchHistory',
         'clearSearchHistory'
       ])
     },
