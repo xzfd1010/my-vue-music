@@ -99,7 +99,7 @@
 </template>
 
 <script type="text/ecmascript-6">
-  import {mapGetters, mapMutations} from 'vuex'
+  import {mapGetters, mapMutations, mapActions} from 'vuex'
   import animations from 'create-keyframe-animation'
   import {prefixStyle} from 'common/js/dom'
   import ProgressBar from 'base/progress-bar/progress-bar'
@@ -251,6 +251,8 @@
       ready() {
         // 为了防止快速点击报错
         this.songReady = true
+        // 存到本地播放历史中
+        this.savePlayHistory(this.currentSong)
       },
       error() {
         // 报错时，如果不修改状态，播放等功能就无法触发
@@ -396,7 +398,10 @@
       },
       ...mapMutations({
         setFullScreen: 'SET_FULL_SCREEN'
-      })
+      }),
+      ...mapActions([
+        'savePlayHistory'
+      ])
     },
     watch: {
       currentSong(newSong, oldSong) {
