@@ -34,6 +34,10 @@
       beforeScroll: {
         type: Boolean,
         default: false
+      },
+      refreshDelay: {
+        type: Number,
+        default: 20
       }
     },
     methods: {
@@ -85,16 +89,16 @@
       }
     },
     mounted() {
-      this.$nextTick(() => {
+      setTimeout(() => {
         this._initScroll()
-      })
+      }, this.refreshDelay)
     },
     // data变化时refresh下
     watch: {
       data() {
-        this.$nextTick(() => {
-          this.refresh()
-        })
+        setTimeout(() => {
+          this._initScroll()
+        }, this.refreshDelay)
       }
     }
   }
