@@ -3,7 +3,7 @@
  */
 
 import {playMode} from 'common/js/config'
-import {loadSearch, loadPlay} from 'common/js/cache'
+import {loadSearch, loadPlay, loadFavorite} from 'common/js/cache'
 
 // 基础数据
 const state = {
@@ -17,7 +17,8 @@ const state = {
   disc: {},
   topList: {},
   searchHistory: loadSearch(), // 获取之前的值
-  playHistory: loadPlay() // 播放历史
+  playHistory: loadPlay(), // 播放历史
+  favoriteList: loadFavorite()
 }
 
 export default state

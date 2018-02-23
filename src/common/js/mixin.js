@@ -75,7 +75,7 @@ export const searchMixin = {
   data() {
     return {
       query: '',
-      refreshDelay: 100
+      refreshDelay: 100 // 共有的动画延迟
     }
   },
   computed: {
