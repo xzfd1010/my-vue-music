@@ -34,7 +34,7 @@ function deleteFromArray(arr, compare) {
 
 export function saveSearch(query) {
   let searches = storage.get(SEARCH_KEY, []) // 默认值[]
-  insertArry(searches, query, (item) => {
+  insertArray(searches, query, (item) => {
     return item === query
   }, SERACH_MAX_LENGTH)
   storage.set(SEARCH_KEY, searches)
