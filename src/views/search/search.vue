@@ -25,7 +25,7 @@
       </scroll>
     </div>
     <div ref="searchResult" class="search-result" v-show="query">
-      <suggest ref="suggest" @select="saveSearch" :query="query" @listScroll="blurInput"></suggest>
+      <suggest @listScroll="blurInput" @select="saveSearch" ref="suggest" :query="query"></suggest>
     </div>
     <confirm ref="confirm" text="是否清空所有搜索历史" confirmBtnText="清空" @confirm="clearSearchHistory"></confirm>
     <router-view></router-view>

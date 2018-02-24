@@ -1,13 +1,15 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Recommend from 'views/recommend/recommend'
-import Singer from 'views/singer/singer'
-import Rank from 'views/rank/rank'
-import Search from 'views/search/search'
-import SingerDetail from 'views/singer-detail/singer-detail'
-import Disc from 'views/disc/disc'
-import TopList from 'views/top-list/top-list'
-import UserCenter from 'views/user-center/user-center'
+
+// 路由懒加载
+const Recommend = () => import('views/recommend/recommend')
+const Singer = () => import('views/singer/singer')
+const Rank = () => import('views/rank/rank')
+const Search = () => import('views/search/search')
+const SingerDetail = () => import('views/singer-detail/singer-detail')
+const Disc = () => import('views/disc/disc')
+const TopList = () => import('views/top-list/top-list')
+const UserCenter = () => import('views/user-center/user-center')
 
 Vue.use(Router)
 

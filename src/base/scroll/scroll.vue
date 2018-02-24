@@ -15,7 +15,7 @@
       },
       click: {
         type: Boolean,
-        default: true
+        default: false
       },
       data: {
         type: Array,
@@ -29,7 +29,7 @@
       // 是否上拉刷新
       pullup: {
         type: Boolean,
-        default: true
+        default: false
       },
       beforeScroll: {
         type: Boolean,

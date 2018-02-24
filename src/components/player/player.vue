@@ -59,13 +59,13 @@
               <i :class="iconMode"></i>
             </div>
             <div class="icon i-left" :class="disableCls">
-              <i class="icon-prev" @click="prev"></i>
+              <i class="icon-prev" @click.stop="prev"></i>
             </div>
             <div class="icon i-center" :class="disableCls">
               <i :class="playIcon" @click="togglePlaying"></i>
             </div>
             <div class="icon i-right" :class="disableCls">
-              <i class="icon-next" @click="next"></i>
+              <i class="icon-next" @click.stop="next"></i>
             </div>
             <div class="icon i-right">
               <i class="icon" @click="toggleFavorite(currentSong)" :class="getFavoriteIcon(currentSong)"></i>
@@ -93,7 +93,7 @@
     </transition>
     <playlist ref="playlist"></playlist>
     <!--在currentSong发生改变的时候执行play()-->
-    <audio :src="currentSong.url" ref="audio" @canplay="ready" @error="error" @timeupdate="updateTime"
+    <audio :src="currentSong.url" ref="audio" @play="ready" @error="error" @timeupdate="updateTime"
            @ended="end"></audio>
   </div>
 </template>
@@ -217,6 +217,7 @@
         // 如果列表只有一首歌曲
         if (this.playlist.length === 1) {
           this.loop()
+          return // 不需要重新设置songReady
         } else {
           let index = this.currentIndex + 1 // 下一首歌
           if (index === this.playlist.length) {
@@ -236,6 +237,8 @@
         // 如果列表只有一首歌曲
         if (this.playlist.length === 1) {
           this.loop()
+          console.log('executed')
+          return // 不需要重新设置songReady
         } else {
           let index = this.currentIndex - 1
           if (index === -1) {
@@ -296,6 +299,10 @@
       },
       getLyric() {
         this.currentSong.getLyric().then((lyric) => {
+          // 异步的过程，如果currentSong已经切换，返回
+          if (this.currentSong.lyric !== lyric) {
+            return
+          }
           this.currentLyric = new Lyric(lyric, this.handleLyric)
           if (this.playing) {
             this.currentLyric.play()
@@ -416,9 +423,16 @@
         // currentSong切换时，currentLyric停止播放
         if (this.currentLyric) {
           this.currentLyric.stop()
+          // 清理操作
+          this.currentTime = 0
+          this.playingLyric = ''
+          this.currentLineNum = 0
         }
         // 为了解决微信的问题，从后台到前台可以重新播放？？？
-        setTimeout(() => {
+        // 要保证里面的逻辑只执行一次
+        clearTimeout(this.timer)
+        this.timer = setTimeout(() => {
+          // 在播放时才去触发play事件，修改songReady状态
           this.$refs.audio.play()
           this.getLyric()
         }, 1000)

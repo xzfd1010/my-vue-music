@@ -18,7 +18,8 @@
               <song-list :songs="playHistory" @select="selectSong"></song-list>
             </div>
           </scroll>
-          <scroll ref="searchList" :refreshDelay="refreshDelay" class="list-scroll" v-if="currentIndex===1" :data="searchHistory">
+          <scroll ref="searchList" :refreshDelay="refreshDelay" class="list-scroll" v-if="currentIndex===1"
+                  :data="searchHistory">
             <div class="list-inner">
               <search-list @delete="deleteSearchHistory"
                            @select="addQuery"
@@ -28,7 +29,7 @@
         </div>
       </div>
       <div class="search-result" v-show="query">
-        <suggest :query="query" :showSinger="showSinger" @select="selectSuggest"></suggest>
+        <suggest :query="query" :showSinger="showSinger" @select="selectSuggest" @listScroll="blurInput"></suggest>
       </div>
       <top-tip ref="topTip">
         <div class="tip-title">
@@ -73,6 +74,9 @@
     methods: {
       show() {
         this.showFlag = true
+        this.refreshList()
+      },
+      refreshList() {
         setTimeout(() => {
           if (this.currentIndex === 0) {
             this.$refs.songList.refresh()
@@ -103,6 +107,13 @@
       ...mapActions([
         'insertSong'
       ])
+    },
+    watch: {
+      query(newVal) {
+        if (!newVal) {
+          this.refreshList()
+        }
+      }
     },
     components: {
       SearchBox,

@@ -39,23 +39,22 @@
   export default {
     name: '',
     props: {
-      // 检索词
-      query: {
-        type: String,
-        default: ''
-      },
       showSinger: {
         type: Boolean,
         default: true
+      },
+      query: { // 检索词
+        type: String,
+        default: ''
       }
     },
     data() {
       return {
         page: 1,
-        result: [],
         pullup: true,
         beforeScroll: true,
-        hasMore: true // 表示是否加载完的标志位
+        hasMore: true, // 表示是否加载完的标志位
+        result: []
       }
     },
     methods: {
@@ -69,7 +68,7 @@
         // 请求服务端的方法
         this.hasMore = true
         this.$refs.suggest.scrollTo(0, 0)
-        search(this.query, this.page, this.showSinger, perpage).then(res => {
+        search(this.query, this.page, this.showSinger, perpage).then((res) => {
           if (res.code === ERR_OK) {
             // 获取到data之后，进行处理；如果有song属性，映射为song对象
             this.result = this._genResult(res.data)
@@ -82,28 +81,15 @@
           return
         }
         this.page++
-        search(this.query, this.page, this.showSinger, perpage).then(res => {
+        search(this.query, this.page, this.showSinger, perpage).then((res) => {
           if (res.code === ERR_OK) {
             this.result = this.result.concat(this._genResult(res.data))
             this._checkMore(res.data)
           }
         })
       },
-      getIconCls(item) {
-        // 修改icon样式
-        if (item.type === TYPE_SINGER) {
-          return 'icon-mine'
-        } else {
-          return 'icon-music'
-        }
-      },
-      getDisplayName(item) {
-        if (item.type === TYPE_SINGER) {
-          return item.singername
-        } else {
-          // item已经是song对象，可以直接取name和singer，不需要暴露singername
-          return `${item.name}-${item.singer}`
-        }
+      listScroll() {
+        this.$emit('listScroll')
       },
       selectItem(item) {
         // 如果是歌手
@@ -122,20 +108,27 @@
           this.insertSong(item)
         }
         // 派发事件，交给父组件处理，用于保存历史
-        this.$emit('select')
+        this.$emit('select', item)
       },
-      listScroll() {
-        this.$emit('listScroll')
+      getDisplayName(item) {
+        if (item.type === TYPE_SINGER) {
+          return item.singername
+        } else {
+          // item已经是song对象，可以直接取name和singer，不需要暴露singername
+          return `${item.name}-${item.singer}`
+        }
       },
-      _checkMore(data) {
-        const song = data.song
-        if (!song.list.length || (song.curnum + song.curpage * perpage) >= song.totalnum) {
-          this.hasMore = false
+      getIconCls(item) {
+        // 修改icon样式
+        if (item.type === TYPE_SINGER) {
+          return 'icon-mine'
+        } else {
+          return 'icon-music'
         }
       },
       _genResult(data) {
         let ret = []
-        if (data.zhida && data.zhida.singerid) {
+        if (data.zhida && data.zhida.singerid && this.page === 1) {
           // 扩展一个对象,利用type标识是歌手的数据
           ret.push({...data.zhida, ...{type: TYPE_SINGER}})
         }
@@ -154,6 +147,12 @@
         })
         return ret
       },
+      _checkMore(data) {
+        const song = data.song
+        if (!song.list.length || (song.curnum + (song.curpage - 1) * perpage) >= song.totalnum) {
+          this.hasMore = false
+        }
+      },
       ...mapMutations({
         setSinger: 'SET_SINGER'
       }),
@@ -162,8 +161,11 @@
       ])
     },
     watch: {
-      query() {
-        this.search()
+      query(newQuery) {
+        if (!newQuery) {
+          return
+        }
+        this.search(newQuery)
       }
     },
     components: {
