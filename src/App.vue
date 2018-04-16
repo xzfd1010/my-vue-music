@@ -20,6 +20,9 @@
       MHeader,
       Tab,
       Player
+    },
+    mounted(){
+      console.log('this is just for testing rebase')
     }
   }
 </script>

@@ -68,6 +68,7 @@
         // 请求服务端的方法
         this.hasMore = true
         this.$refs.suggest.scrollTo(0, 0)
+        // 需要查询字段，页数，是否显示歌手，每页的数目
         search(this.query, this.page, this.showSinger, perpage).then((res) => {
           if (res.code === ERR_OK) {
             // 获取到data之后，进行处理；如果有song属性，映射为song对象
@@ -148,7 +149,8 @@
         return ret
       },
       _checkMore(data) {
-        const song = data.song
+        const song = data.song // 获取此次请求的所有歌曲
+        // 如果song.list为空 || 此次的歌曲+之前的歌曲数目 === song.totalnum 置为false
         if (!song.list.length || (song.curnum + (song.curpage - 1) * perpage) >= song.totalnum) {
           this.hasMore = false
         }
