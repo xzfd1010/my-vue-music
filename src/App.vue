@@ -23,6 +23,7 @@
     },
     mounted(){
       console.log('this is just for testing rebase')
+      console.log('another commit for rebase')
     }
   }
 </script>
